@@ -1,4 +1,4 @@
-import SamplePage from './pages/SamplePage';
+import PodcastAnalysis from './pages/PodcastAnalysis';
 import type { ReactNode } from 'react';
 
 interface RouteConfig {
@@ -10,9 +10,9 @@ interface RouteConfig {
 
 const routes: RouteConfig[] = [
   {
-    name: 'Sample Page',
+    name: 'choSense 播客分析',
     path: '/',
-    element: <SamplePage />
+    element: <PodcastAnalysis />
   }
 ];
 
