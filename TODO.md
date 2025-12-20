@@ -48,4 +48,5 @@
 1. **历史记录不可见**：原因是当没有建议时提前return，不保存历史记录。已修复为无论是否有建议都保存。
 2. **画像重复显示**：原因是getAllDisciplineRecords同时包含当前记录和历史记录，但当前记录已被添加到历史中。已修复为仅从历史中获取。
 3. **画像更新不可见**：由于重复显示bug导致，修复重复显示后自动解决。
+4. **SuggestionCard组件崩溃**：原因是getTypeConfig函数缺少default分支，当suggestion.type不匹配时返回undefined。已添加default分支返回默认配置。
 

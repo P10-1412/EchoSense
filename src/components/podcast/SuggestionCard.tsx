@@ -40,6 +40,16 @@ export default function SuggestionCard({ suggestion }: SuggestionCardProps) {
           label: '风险预警',
           emoji: '⚠️'
         };
+      default:
+        // 默认配置，防止 undefined 错误
+        return {
+          icon: Sparkles,
+          color: 'text-blue-600',
+          bgColor: 'bg-blue-50 dark:bg-blue-950',
+          borderColor: 'border-blue-200 dark:border-blue-800',
+          label: '建议',
+          emoji: '💡'
+        };
     }
   };
 
