@@ -25,7 +25,7 @@ const api = {
   // 网页内容总结
   webSummary: (webUrl: string, query: string) =>
     apiClient.post(
-      'https://api-integrations.appmiaoda.com/app-8cr4d2k2ascg/api-1mELbNm0Lx8v/v2/components/c-wf-e1bc471f-1d33-4df1-ab42-87800e89c1ad',
+      'https://api-integrations.appmiaoda.com/app-8ctbg09h5bsw/api-1mELbNm0Lx8v/v2/components/c-wf-e1bc471f-1d33-4df1-ab42-87800e89c1ad',
       {
         parameters: {
           _sys_origin_query: query,
@@ -38,4 +38,4 @@ const api = {
 export default api;
 
 // 文心大模型API端点
-export const WENXIN_CHAT_ENDPOINT = 'https://api-integrations.appmiaoda.com/app-8cr4d2k2ascg/api-2bk93oeO9NlE/v2/chat/completions';
+export const WENXIN_CHAT_ENDPOINT = 'https://api-integrations.appmiaoda.com/app-8ctbg09h5bsw/api-2bk93oeO9NlE/v2/chat/completions';
