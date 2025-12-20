@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Loader2, Radio, Link2, FileText, Sparkles, Eye, EyeOff, Settings, History, Database } from 'lucide-react';
+import { Loader2, Radio, Link2, FileText, Sparkles, Eye, EyeOff, Settings, History, Database, User } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import api, { WENXIN_CHAT_ENDPOINT } from '@/services/api';
 import { sendChatStream } from '@/services/chatStream';
@@ -15,6 +15,7 @@ import DisciplineProfile from '@/components/podcast/DisciplineProfile';
 import SettingsPanel from '@/components/settings/SettingsPanel';
 import HistoryPanel from '@/components/history/HistoryPanel';
 import CaseDatabasePanel from '@/components/database/CaseDatabasePanel';
+import ProfileManagementPanel, { DEFAULT_PROFILE, ProfileData } from '@/components/profile/ProfileManagementPanel';
 import { 
   InputMode, 
   Suggestion, 
@@ -32,6 +33,7 @@ import {
 
 const APP_ID = import.meta.env.VITE_APP_ID;
 const USER_PROFILE_KEY = 'chosense_user_profile';
+const PERSONAL_PROFILE_KEY = 'chosense_personal_profile';
 const SETTINGS_KEY = 'chosense_settings';
 const HISTORY_KEY = 'chosense_history';
 const CASES_KEY = 'chosense_cases';
@@ -47,8 +49,11 @@ export default function PodcastAnalysis() {
   const [disciplineRecords, setDisciplineRecords] = useState<DisciplineRecord[]>([]);
   const [showHighValueDialog, setShowHighValueDialog] = useState(false);
   
-  // 用户画像
+  // 用户画像（AI生成的学科画像）
   const [userProfile, setUserProfile] = useState<UserProfile>(DEFAULT_USER_PROFILE);
+  
+  // 个人画像（用户手动填写）
+  const [personalProfile, setPersonalProfile] = useState<ProfileData>(DEFAULT_PROFILE);
   
   // 用户设置
   const [settings, setSettings] = useState<UserSettings>(DEFAULT_SETTINGS);
@@ -64,18 +69,29 @@ export default function PodcastAnalysis() {
   const [showSettingsDialog, setShowSettingsDialog] = useState(false);
   const [showHistoryDialog, setShowHistoryDialog] = useState(false);
   const [showCasesDialog, setShowCasesDialog] = useState(false);
+  const [showProfileDialog, setShowProfileDialog] = useState(false);
   
   const { toast } = useToast();
 
   // 加载所有数据
   useEffect(() => {
-    // 加载用户画像
+    // 加载用户画像（AI生成）
     const storedProfile = localStorage.getItem(USER_PROFILE_KEY);
     if (storedProfile) {
       try {
         setUserProfile(JSON.parse(storedProfile));
       } catch (error) {
         console.error('加载用户画像失败:', error);
+      }
+    }
+    
+    // 加载个人画像（用户填写）
+    const storedPersonalProfile = localStorage.getItem(PERSONAL_PROFILE_KEY);
+    if (storedPersonalProfile) {
+      try {
+        setPersonalProfile(JSON.parse(storedPersonalProfile));
+      } catch (error) {
+        console.error('加载个人画像失败:', error);
       }
     }
     
@@ -110,10 +126,16 @@ export default function PodcastAnalysis() {
     }
   }, []);
 
-  // 保存用户画像
+  // 保存用户画像（AI生成）
   const saveUserProfile = (profile: UserProfile) => {
     localStorage.setItem(USER_PROFILE_KEY, JSON.stringify(profile));
     setUserProfile(profile);
+  };
+  
+  // 保存个人画像（用户填写）
+  const savePersonalProfile = (profile: ProfileData) => {
+    localStorage.setItem(PERSONAL_PROFILE_KEY, JSON.stringify(profile));
+    setPersonalProfile(profile);
   };
   
   // 保存设置
@@ -132,6 +154,18 @@ export default function PodcastAnalysis() {
   const saveCases = (newCases: CaseDatabase[]) => {
     localStorage.setItem(CASES_KEY, JSON.stringify(newCases));
     setCases(newCases);
+  };
+  
+  // 清空历史记录
+  const clearHistory = () => {
+    localStorage.removeItem(HISTORY_KEY);
+    setHistory([]);
+  };
+  
+  // 清空画像数据
+  const clearProfile = () => {
+    localStorage.removeItem(USER_PROFILE_KEY);
+    setUserProfile(DEFAULT_USER_PROFILE);
   };
 
   // 解析AI返回的JSON
@@ -219,8 +253,43 @@ export default function PodcastAnalysis() {
 - 仅识别前1%极高价值或前10%高价值内容
 - 提供相对价值评估（不输出绝对金额）
 - 整合五大学科视角（法律、心理、商业、健康、传播）
+- 综合用户画像和案例数据库进行精准评估
 
-【用户画像】
+【用户个人画像】（用户主动提供）
+传播学画像：
+- 账号名称：${personalProfile.communication.accountName || '未填写'}
+- 粉丝规模：${personalProfile.communication.followers || '未填写'}
+- 内容类别：${personalProfile.communication.category || '未填写'}
+- 内容风格：${personalProfile.communication.style || '未填写'}
+- 受众年龄：${personalProfile.communication.audienceAge || '未填写'}
+- 受众兴趣：${personalProfile.communication.audienceInterests || '未填写'}
+- 内容主题：${personalProfile.communication.contentThemes || '未填写'}
+- 更新频率：${personalProfile.communication.updateFrequency || '未填写'}
+- 平均互动率：${personalProfile.communication.avgEngagement || '未填写'}
+
+心理画像：
+- 情绪模式：${personalProfile.psychology.emotionalPatterns || '未填写'}
+- 认知特征：${personalProfile.psychology.cognitiveTraits || '未填写'}
+- 信念系统：${personalProfile.psychology.beliefSystem || '未填写'}
+- 压力反应：${personalProfile.psychology.stressResponse || '未填写'}
+
+商业画像：
+- 商业认知：${personalProfile.business.businessKnowledge || '未填写'}
+- 财务素养：${personalProfile.business.financialLiteracy || '未填写'}
+- 变现历史：${personalProfile.business.monetizationHistory || '未填写'}
+- 风险承受：${personalProfile.business.riskTolerance || '未填写'}
+
+健康画像：
+- 生活方式：${personalProfile.health.lifestylePatterns || '未填写'}
+- 压力水平：${personalProfile.health.stressLevel || '未填写'}
+- 健康意识：${personalProfile.health.healthAwareness || '未填写'}
+
+法律画像：
+- 法律风险：${personalProfile.law.legalRisks || '未填写'}
+- 合规问题：${personalProfile.law.complianceIssues || '未填写'}
+- 免责声明：${personalProfile.law.disclaimerUsage || '未填写'}
+
+【AI生成的学科画像】（历史积累）
 账号风格：${userProfile.communication.accountStyle}
 受众画像：${userProfile.communication.audienceProfile}
 内容主题：${userProfile.communication.contentThemes.join('、')}
@@ -228,8 +297,25 @@ export default function PodcastAnalysis() {
 风险承受能力：${userProfile.business.riskTolerance}
 投资贴现率：${userProfile.business.investmentDiscount}
 
+【案例数据库】（${cases.length}个案例）
+${cases.length > 0 ? `
+商业化案例：${cases.filter(c => c.type === 'commercial').length}个
+传播案例：${cases.filter(c => c.type === 'viral').length}个
+风险案例：${cases.filter(c => c.type === 'risk').length}个
+
+最近案例示例：
+${cases.slice(0, 3).map(c => `- [${c.type}] ${c.accountInfo.name}: ${c.eventDescription}`).join('\n')}
+` : '暂无案例数据'}
+
 【播客内容】
 ${podcastContent}
+
+【价值评估要求】
+1. **综合画像分析**：结合用户个人画像和AI生成画像，全面了解创作者特征
+2. **案例匹配**：从案例数据库中寻找相似案例，作为价值评估的参考基准
+3. **相对价值计算**：基于相似案例的历史表现，评估当前内容的相对价值
+4. **风险评估**：结合用户的法律画像和风险承受能力，评估潜在风险
+5. **个性化建议**：根据用户的心理画像、商业画像，提供可执行的建议
 
 【分析要求】
 请严格按照以下JSON格式输出（必须是有效的JSON）：
@@ -409,6 +495,21 @@ ${podcastContent}
             saveUserProfile(updatedProfile);
           }
 
+          // 保存历史记录
+          const newHistoryItem: AnalysisHistory = {
+            id: `history_${Date.now()}`,
+            date: new Date().toISOString(),
+            inputMode: inputMode,
+            podcastTitle: inputMode === InputMode.URL ? podcastUrl : '手动输入的播客内容',
+            inputContent: inputMode === InputMode.URL ? podcastUrl : transcript.substring(0, 200) + '...',
+            suggestions: suggestions,
+            disciplineRecords: disciplines,
+            timestamp: Date.now(),
+          };
+          
+          const updatedHistory = [newHistoryItem, ...history];
+          saveHistory(updatedHistory);
+
           // 检查是否有极高价值内容（前1%）
           const criticalSuggestions = suggestions.filter(s => s.priority === 'critical');
           
@@ -496,6 +597,15 @@ ${podcastContent}
               <Button
                 variant="outline"
                 size="sm"
+                onClick={() => setShowProfileDialog(true)}
+                className="gap-2"
+              >
+                <User className="h-4 w-4" />
+                个人画像
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={() => setShowSettingsDialog(true)}
                 className="gap-2"
               >
@@ -509,7 +619,7 @@ ${podcastContent}
                 className="gap-2"
               >
                 <History className="h-4 w-4" />
-                历史记录
+                历史分析报告
                 {history.length > 0 && (
                   <span className="ml-1 rounded-full bg-primary px-2 py-0.5 text-xs text-primary-foreground">
                     {history.length}
@@ -695,6 +805,19 @@ ${podcastContent}
         </DialogContent>
       </Dialog>
 
+      {/* 个人画像对话框 */}
+      <Dialog open={showProfileDialog} onOpenChange={setShowProfileDialog}>
+        <DialogContent className="max-h-[90vh] max-w-4xl overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>个人画像管理</DialogTitle>
+            <DialogDescription>
+              填写您的个人信息，系统将根据这些信息提供更精准的价值评估
+            </DialogDescription>
+          </DialogHeader>
+          <ProfileManagementPanel profile={personalProfile} onProfileChange={savePersonalProfile} />
+        </DialogContent>
+      </Dialog>
+
       {/* 设置对话框 */}
       <Dialog open={showSettingsDialog} onOpenChange={setShowSettingsDialog}>
         <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
@@ -704,15 +827,20 @@ ${podcastContent}
               自定义分析行为和显示偏好
             </DialogDescription>
           </DialogHeader>
-          <SettingsPanel settings={settings} onSettingsChange={saveSettings} />
+          <SettingsPanel 
+            settings={settings} 
+            onSettingsChange={saveSettings}
+            onClearHistory={clearHistory}
+            onClearProfile={clearProfile}
+          />
         </DialogContent>
       </Dialog>
 
-      {/* 历史记录对话框 */}
+      {/* 历史分析报告对话框 */}
       <Dialog open={showHistoryDialog} onOpenChange={setShowHistoryDialog}>
         <DialogContent className="max-h-[90vh] max-w-4xl overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>分析历史记录</DialogTitle>
+            <DialogTitle>历史分析报告</DialogTitle>
             <DialogDescription>
               查看所有历史分析记录和建议
             </DialogDescription>

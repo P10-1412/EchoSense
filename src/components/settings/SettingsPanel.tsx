@@ -11,16 +11,29 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Settings, Bell, Filter, BookOpen, Gauge } from 'lucide-react';
+import { Settings, Bell, Filter, BookOpen, Gauge, Trash2, AlertTriangle } from 'lucide-react';
 import { UserSettings, DEFAULT_SETTINGS } from '@/types/podcast';
 import { useToast } from '@/hooks/use-toast';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 
 interface SettingsPanelProps {
   settings: UserSettings;
   onSettingsChange: (settings: UserSettings) => void;
+  onClearHistory?: () => void;
+  onClearProfile?: () => void;
 }
 
-export default function SettingsPanel({ settings, onSettingsChange }: SettingsPanelProps) {
+export default function SettingsPanel({ settings, onSettingsChange, onClearHistory, onClearProfile }: SettingsPanelProps) {
   const [localSettings, setLocalSettings] = useState<UserSettings>(settings);
   const { toast } = useToast();
 
@@ -38,6 +51,26 @@ export default function SettingsPanel({ settings, onSettingsChange }: SettingsPa
       title: '设置已重置',
       description: '所有设置已恢复为默认值',
     });
+  };
+
+  const handleClearHistory = () => {
+    if (onClearHistory) {
+      onClearHistory();
+      toast({
+        title: '历史记录已清空',
+        description: '所有分析历史记录已被删除',
+      });
+    }
+  };
+
+  const handleClearProfile = () => {
+    if (onClearProfile) {
+      onClearProfile();
+      toast({
+        title: '画像数据已清空',
+        description: '所有学科画像记录已被删除',
+      });
+    }
   };
 
   return (
@@ -298,6 +331,78 @@ export default function SettingsPanel({ settings, onSettingsChange }: SettingsPa
             {localSettings.analysisDepth === 'standard' && '标准分析，提供全面的价值评估和建议'}
             {localSettings.analysisDepth === 'detailed' && '深度分析，包含详细的案例匹配和多维度评估'}
           </p>
+        </CardContent>
+      </Card>
+
+      {/* 数据管理 */}
+      <Card className="border-destructive/50">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-destructive">
+            <AlertTriangle className="h-5 w-5" />
+            数据管理
+          </CardTitle>
+          <CardDescription>
+            清空历史数据和画像记录（此操作不可恢复）
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="font-medium">清空历史分析报告</p>
+              <p className="text-sm text-muted-foreground">删除所有历史分析记录和建议</p>
+            </div>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="destructive" size="sm">
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  清空历史
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>确认清空历史记录？</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    此操作将永久删除所有历史分析报告，无法恢复。建议在清空前先导出备份。
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>取消</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleClearHistory} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                    确认清空
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
+
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="font-medium">清空学科画像</p>
+              <p className="text-sm text-muted-foreground">删除所有学科画像记录</p>
+            </div>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="destructive" size="sm">
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  清空画像
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>确认清空画像数据？</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    此操作将永久删除所有学科画像记录，无法恢复。建议在清空前先导出备份。
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>取消</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleClearProfile} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                    确认清空
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
         </CardContent>
       </Card>
 
