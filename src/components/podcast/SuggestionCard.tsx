@@ -300,7 +300,7 @@ function RiskDetails({
       </div>
 
       {/* 相对风险评估 */}
-      <RelativeValueDisplay relativeValue={suggestion.relativeRisk} getDifficultyBadge={getDifficultyBadge} isRisk />
+      <RelativeValueDisplay relativeValue={suggestion.relativeValue} getDifficultyBadge={getDifficultyBadge} isRisk />
 
       {/* 潜在影响 */}
       <Alert className="border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-950">

@@ -1,91 +1,113 @@
 // ==================== 核心枚举 ====================
 
-// 输入模式
 export enum InputMode {
   URL = 'url',
   TRANSCRIPT = 'transcript'
 }
 
-// 建议类型
 export enum SuggestionType {
-  COMMERCIAL = 'commercial', // 商业化价值
-  VIRAL = 'viral', // 传播价值
-  RISK = 'risk', // 风险预警
+  COMMERCIAL = 'commercial',
+  VIRAL = 'viral',
+  RISK = 'risk',
 }
 
-// 优先级
 export enum Priority {
-  CRITICAL = 'critical', // 极高（前1%）
-  HIGH = 'high', // 高（前10%）
-  MEDIUM = 'medium', // 中
-  LOW = 'low' // 低
+  CRITICAL = 'critical',
+  HIGH = 'high',
+  MEDIUM = 'medium',
+  LOW = 'low'
 }
 
-// 五大核心学科
 export enum DisciplineType {
-  LAW = 'law', // 法律
-  PSYCHOLOGY = 'psychology', // 心理
-  BUSINESS = 'business', // 商业/会计
-  HEALTH = 'health', // 健康/医学
-  COMMUNICATION = 'communication' // 传播学
+  LAW = 'law',
+  PSYCHOLOGY = 'psychology',
+  BUSINESS = 'business',
+  HEALTH = 'health',
+  COMMUNICATION = 'communication'
 }
 
-// ==================== 相对价值评估体系 ====================
+// ==================== 相对价值评估 ====================
 
-// 参考案例
 export interface ReferenceCase {
   id: string;
-  description: string; // 案例描述
-  context: string; // 相似场景
-  audienceSize: string; // 受众规模（如"5-10万粉丝"）
-  priceRange?: string; // 报价区间（如"8000-15000元"）
-  effectData?: string; // 效果数据（如"互动率提升3-5%"）
-  source: string; // 数据来源
+  description: string;
+  context: string;
+  audienceSize: string;
+  priceRange?: string;
+  effectData?: string;
+  source: string;
 }
 
-// 相对价值（不输出绝对值）
 export interface RelativeValue {
-  percentile: number; // 历史分位数（0-100）
-  rank: string; // 排名描述（如"前1%"、"前10%"）
-  referenceCases: ReferenceCase[]; // 参考案例
-  explanation: string; // 可解释路径
+  percentile: number;
+  rank: string;
+  referenceCases: ReferenceCase[];
+  explanation: string;
   adoptionCost: {
-    timeRequired: string; // 所需时间（如"30分钟"）
-    difficulty: 'easy' | 'medium' | 'hard'; // 执行难度
-    resources: string[]; // 所需资源
+    timeRequired: string;
+    difficulty: 'easy' | 'medium' | 'hard';
+    resources: string[];
   };
 }
 
-// ==================== 全科画像系统 ====================
+// ==================== 画像系统（仅记录客观事实） ====================
 
-// 学科记录
 export interface DisciplineRecord {
   id: string;
   discipline: DisciplineType;
   date: string;
   podcastTitle: string;
-  findings: string[]; // 核心发现
-  suggestions: string[]; // 建议
-  severity?: 'low' | 'medium' | 'high'; // 严重程度（风险类）
+  observations: string[]; // 客观观察，不包含建议
+  severity?: 'low' | 'medium' | 'high';
 }
 
-// 用户画像
+export interface PsychologyProfile {
+  emotionalPatterns: string[];
+  cognitiveTraits: string[];
+  beliefSystems: string[];
+  stressResponses: string[];
+}
+
+export interface CommunicationProfile {
+  accountStyle: string;
+  audienceProfile: {
+    demographics: string;
+    interests: string[];
+    engagementPatterns: string;
+  };
+  contentThemes: string[];
+  avgEngagement: number;
+  contentStyle: string;
+  updateFrequency: string;
+}
+
+export interface LawProfile {
+  riskAreas: string[];
+  complianceIssues: string[];
+  disclaimerUsage: string;
+}
+
+export interface BusinessProfile {
+  investmentDiscount: number;
+  riskTolerance: 'low' | 'medium' | 'high';
+  monetizationHistory: string[];
+  businessKnowledge: string[];
+  financialLiteracy: string;
+}
+
+export interface HealthProfile {
+  lifestylePatterns: string[];
+  stressIndicators: string[];
+  healthAwareness: string;
+}
+
 export interface UserProfile {
   userId: string;
-  // 传播学画像
-  communication: {
-    accountStyle: string; // 账号风格
-    audienceProfile: string; // 受众画像
-    contentThemes: string[]; // 内容主题
-    avgEngagement: number; // 平均互动率
-  };
-  // 商业画像
-  business: {
-    investmentDiscount: number; // 投资贴现率
-    riskTolerance: 'low' | 'medium' | 'high'; // 风险承受能力
-    monetizationHistory: string[]; // 变现历史
-  };
-  // 五大学科历史记录
+  psychology: PsychologyProfile;
+  communication: CommunicationProfile;
+  law: LawProfile;
+  business: BusinessProfile;
+  health: HealthProfile;
   disciplineHistory: {
     law: DisciplineRecord[];
     psychology: DisciplineRecord[];
@@ -93,46 +115,34 @@ export interface UserProfile {
     health: DisciplineRecord[];
     communication: DisciplineRecord[];
   };
-  // 动态主题学科（最多2个）
   customDisciplines?: {
     name: string;
     records: DisciplineRecord[];
   }[];
 }
 
-// ==================== 分析建议 ====================
+// ==================== 建议类型 ====================
 
-// 商业化建议
 export interface CommercialSuggestion {
   id: string;
   type: SuggestionType.COMMERCIAL;
-  position: string; // 位置（如"第15分钟30秒"）
-  timeRange: string; // 时间范围
-  content: string; // 段落内容
+  position: string;
+  timeRange: string;
+  content: string;
   title: string;
-  
-  // 商业适配度分析
   compatibility: {
-    naturalEmbedding: number; // 自然嵌入可能性（0-100）
-    audienceClarity: number; // 受众明确度（0-100）
-    viewpointCompleteness: number; // 观点闭环完整性（0-100）
-    overallScore: number; // 综合评分
+    naturalEmbedding: number;
+    audienceClarity: number;
+    viewpointCompleteness: number;
+    overallScore: number;
   };
-  
-  // 相对价值
-  relativeValue: RelativeValue;
-  
-  // 适配广告形态
-  adFormats: string[]; // 如["中插口播广告", "品牌共创测评"]
-  
-  // 可操作建议
+  relativeValue?: RelativeValue;
+  adFormats: string[];
   actionableAdvice: string;
-  scriptSample: string; // 口播脚本示例
-  
+  scriptSample: string;
   priority: Priority;
 }
 
-// 传播价值建议
 export interface ViralSuggestion {
   id: string;
   type: SuggestionType.VIRAL;
@@ -140,29 +150,19 @@ export interface ViralSuggestion {
   timeRange: string;
   content: string;
   title: string;
-  
-  // 传播潜力分析
   viralPotential: {
-    counterIntuitive: number; // 反直觉程度（0-100）
-    conflictLevel: number; // 与主流叙事冲突性（0-100）
-    clipability: number; // 可切片性（0-100）
+    counterIntuitive: number;
+    conflictLevel: number;
+    clipability: number;
     overallScore: number;
   };
-  
-  // 相对价值
-  relativeValue: RelativeValue;
-  
-  // 传播路径
-  distributionPaths: string[]; // 如["小红书观点共鸣", "知乎话题讨论"]
-  
-  // 可操作建议
+  relativeValue?: RelativeValue;
+  distributionPaths: string[];
+  contentStrategy: string;
   actionableAdvice: string;
-  contentStrategy: string; // 内容策略
-  
   priority: Priority;
 }
 
-// 风险预警建议
 export interface RiskSuggestion {
   id: string;
   type: SuggestionType.RISK;
@@ -170,159 +170,138 @@ export interface RiskSuggestion {
   timeRange: string;
   content: string;
   title: string;
-  
-  // 风险分析
   riskAnalysis: {
-    extremism: number; // 观点极端度（0-100）
-    uncertainty: number; // 事实不确定性（0-100）
-    groupSensitivity: number; // 群体标签触及度（0-100）
+    extremism: number;
+    uncertainty: number;
+    groupSensitivity: number;
     overallScore: number;
   };
-  
-  // 相对风险
-  relativeRisk: RelativeValue;
-  
-  // 潜在影响
-  potentialImpact: string; // 如"评论区极化，互动率下降3-8%"
-  
-  // 可操作建议
+  relativeValue?: RelativeValue;
+  potentialImpact: string;
+  originalStatement: string;
+  revisedStatement: string;
   actionableAdvice: string;
-  originalStatement: string; // 原表述
-  revisedStatement: string; // 修改后表述
-  
   priority: Priority;
 }
 
-// 统一建议类型
 export type Suggestion = CommercialSuggestion | ViralSuggestion | RiskSuggestion;
 
-// ==================== 分析结果 ====================
+// ==================== 历史记录 ====================
 
-export interface AnalysisResult {
-  // 高价值建议（仅前1%或前10%）
-  highValueSuggestions: Suggestion[];
-  
-  // 全科画像更新
-  disciplineUpdates: DisciplineRecord[];
-  
-  // 内容结构总结
-  structureSummary: string;
-  
-  // 分析时间戳
+export interface AnalysisHistory {
+  id: string;
+  date: string;
+  inputMode: InputMode;
+  inputContent: string;
+  podcastTitle: string;
+  suggestions: Suggestion[];
+  disciplineRecords: DisciplineRecord[];
   timestamp: number;
-  
-  // 是否触发弹窗
-  shouldTriggerAlert: boolean;
 }
 
-// ==================== 参考案例库 ====================
+// ==================== 案例数据库 ====================
 
-// 商业化案例库
-export const COMMERCIAL_CASE_LIBRARY: ReferenceCase[] = [
-  {
-    id: 'comm_001',
-    description: '职场效率工具推荐场景',
-    context: '创业者讨论办公软件使用体验，自然过渡到产品推荐',
-    audienceSize: '5-10万粉丝',
-    priceRange: '8000-15000元',
-    source: '2024年职场类播客商业合作数据'
-  },
-  {
-    id: 'comm_002',
-    description: '生活方式品牌植入',
-    context: '分享个人生活习惯时提及产品使用感受',
-    audienceSize: '10-30万粉丝',
-    priceRange: '15000-30000元',
-    source: '2024年生活方式类播客商业合作数据'
-  },
-  {
-    id: 'comm_003',
-    description: '知识付费课程推广',
-    context: '深度讲解某专业领域知识后推荐系统课程',
-    audienceSize: '3-8万粉丝',
-    priceRange: '5000-12000元',
-    source: '2024年知识类播客商业合作数据'
-  },
-  {
-    id: 'comm_004',
-    description: '消费品测评合作',
-    context: '真实使用体验分享，包含产品优缺点',
-    audienceSize: '8-20万粉丝',
-    priceRange: '10000-25000元',
-    source: '2024年测评类播客商业合作数据'
-  }
-];
+export interface CaseDatabase {
+  id: string;
+  type: 'commercial' | 'viral' | 'risk';
+  date: string;
+  accountInfo: {
+    name: string;
+    followers: string;
+    category: string;
+    style: string;
+  };
+  eventDescription: string;
+  eventResult: {
+    outcome: 'positive' | 'negative' | 'neutral';
+    revenue?: number;
+    loss?: number;
+    fansChange?: number;
+    engagementChange?: number;
+    details: string;
+  };
+  tags: string[];
+  source: string;
+}
 
-// 传播案例库
-export const VIRAL_CASE_LIBRARY: ReferenceCase[] = [
-  {
-    id: 'viral_001',
-    description: '反常识职场观点',
-    context: '提出与主流认知相反的职场发展路径',
-    audienceSize: '触达10-50万人',
-    effectData: '小红书传播，互动率提升5-8%',
-    source: '2024年职场话题传播数据'
-  },
-  {
-    id: 'viral_002',
-    description: '代际认知差异讨论',
-    context: '揭示不同年龄段的隐蔽差异',
-    audienceSize: '触达20-100万人',
-    effectData: '知乎话题讨论，引用量300+',
-    source: '2024年社会话题传播数据'
-  },
-  {
-    id: 'viral_003',
-    description: '行业内幕揭秘',
-    context: '从业者视角分享行业真实情况',
-    audienceSize: '触达15-80万人',
-    effectData: '多平台传播，视频播放量100万+',
-    source: '2024年行业话题传播数据'
-  }
-];
+// ==================== 用户设置 ====================
 
-// 风险案例库
-export const RISK_CASE_LIBRARY: ReferenceCase[] = [
-  {
-    id: 'risk_001',
-    description: '行业绝对化评价',
-    context: '对某行业进行极端负面评价',
-    audienceSize: '影响3000-8000粉丝',
-    effectData: '评论区极化，互动率下降3-8%',
-    source: '2024年播客争议事件数据'
-  },
-  {
-    id: 'risk_002',
-    description: '未经证实的事实陈述',
-    context: '传播未经核实的信息或数据',
-    audienceSize: '影响5000-15000粉丝',
-    effectData: '可能面临法律风险，需公开澄清',
-    source: '2024年播客法律风险案例'
-  },
-  {
-    id: 'risk_003',
-    description: '敏感群体标签化',
-    context: '对特定群体进行刻板印象描述',
-    audienceSize: '影响2000-10000粉丝',
-    effectData: '引发群体反感，掉粉率2-5%',
-    source: '2024年播客舆论风险案例'
-  }
-];
+export interface UserSettings {
+  alertThreshold: {
+    percentile: number;
+    enabled: boolean;
+  };
+  suggestionTypes: {
+    commercial: boolean;
+    viral: boolean;
+    risk: boolean;
+  };
+  disciplines: {
+    law: boolean;
+    psychology: boolean;
+    business: boolean;
+    health: boolean;
+    communication: boolean;
+  };
+  analysisDepth: 'basic' | 'standard' | 'detailed';
+}
 
-// ==================== 默认用户画像 ====================
+export const DEFAULT_SETTINGS: UserSettings = {
+  alertThreshold: {
+    percentile: 1,
+    enabled: true
+  },
+  suggestionTypes: {
+    commercial: true,
+    viral: true,
+    risk: true
+  },
+  disciplines: {
+    law: true,
+    psychology: true,
+    business: true,
+    health: true,
+    communication: true
+  },
+  analysisDepth: 'standard'
+};
 
 export const DEFAULT_USER_PROFILE: UserProfile = {
   userId: 'default',
+  psychology: {
+    emotionalPatterns: [],
+    cognitiveTraits: [],
+    beliefSystems: [],
+    stressResponses: []
+  },
   communication: {
     accountStyle: '知识分享型',
-    audienceProfile: '25-35岁职场人士',
+    audienceProfile: {
+      demographics: '25-35岁职场人士',
+      interests: ['职场发展', '个人成长'],
+      engagementPatterns: '高互动，喜欢深度内容'
+    },
     contentThemes: ['职场发展', '个人成长'],
-    avgEngagement: 3.5
+    avgEngagement: 3.5,
+    contentStyle: '深度分析型',
+    updateFrequency: '每周2-3次'
+  },
+  law: {
+    riskAreas: [],
+    complianceIssues: [],
+    disclaimerUsage: '偶尔使用'
   },
   business: {
-    investmentDiscount: 0.1, // 10%贴现率
+    investmentDiscount: 10,
     riskTolerance: 'medium',
-    monetizationHistory: []
+    monetizationHistory: [],
+    businessKnowledge: [],
+    financialLiteracy: '中等'
+  },
+  health: {
+    lifestylePatterns: [],
+    stressIndicators: [],
+    healthAwareness: '中等'
   },
   disciplineHistory: {
     law: [],
@@ -332,3 +311,98 @@ export const DEFAULT_USER_PROFILE: UserProfile = {
     communication: []
   }
 };
+
+// ==================== 参考案例库 ====================
+
+export const COMMERCIAL_CASE_LIBRARY: ReferenceCase[] = [
+  {
+    id: 'comm_001',
+    description: '职场效率工具推荐',
+    context: '在讨论工作效率提升时自然引入工具推荐',
+    audienceSize: '5-10万粉丝',
+    priceRange: '8000-15000元',
+    effectData: '转化率2-4%',
+    source: '2024年职场类播客商业合作数据'
+  },
+  {
+    id: 'comm_002',
+    description: '生活方式品牌植入',
+    context: '分享个人生活方式时植入品牌',
+    audienceSize: '10-30万粉丝',
+    priceRange: '15000-30000元',
+    effectData: '品牌认知度提升15-25%',
+    source: '2024年生活方式类播客数据'
+  },
+  {
+    id: 'comm_003',
+    description: '知识付费课程推广',
+    context: '深度内容延伸至付费课程',
+    audienceSize: '3-8万粉丝',
+    priceRange: '5000-12000元',
+    effectData: '课程转化率5-10%',
+    source: '2024年知识类播客数据'
+  },
+  {
+    id: 'comm_004',
+    description: '消费品测评合作',
+    context: '产品使用体验分享',
+    audienceSize: '8-20万粉丝',
+    priceRange: '10000-25000元',
+    effectData: '互动率提升4-7%',
+    source: '2024年测评类播客数据'
+  }
+];
+
+export const VIRAL_CASE_LIBRARY: ReferenceCase[] = [
+  {
+    id: 'viral_001',
+    description: '反常识职场观点',
+    context: '挑战传统职场认知',
+    audienceSize: '触达10-50万人',
+    effectData: '互动率提升5-8%，分享率提升10-15%',
+    source: '2024年职场话题传播数据'
+  },
+  {
+    id: 'viral_002',
+    description: '代际认知差异讨论',
+    context: '不同年龄层价值观碰撞',
+    audienceSize: '触达20-100万人',
+    effectData: '知乎引用量300+，微博讨论量5000+',
+    source: '2024年社会话题传播数据'
+  },
+  {
+    id: 'viral_003',
+    description: '行业内幕揭秘',
+    context: '披露行业不为人知的真相',
+    audienceSize: '触达15-80万人',
+    effectData: '视频播放量100万+，评论量2000+',
+    source: '2024年深度内容传播数据'
+  }
+];
+
+export const RISK_CASE_LIBRARY: ReferenceCase[] = [
+  {
+    id: 'risk_001',
+    description: '行业绝对化评价',
+    context: '对某行业做出过于绝对的负面评价',
+    audienceSize: '影响3000-8000粉丝',
+    effectData: '互动率下降3-8%，掉粉率1-3%',
+    source: '2024年舆论风险案例'
+  },
+  {
+    id: 'risk_002',
+    description: '未经证实的事实陈述',
+    context: '传播未经核实的信息',
+    audienceSize: '影响5000-15000粉丝',
+    effectData: '可能面临法律风险，信誉受损',
+    source: '2024年内容合规案例'
+  },
+  {
+    id: 'risk_003',
+    description: '敏感群体标签化',
+    context: '对特定群体使用刻板印象标签',
+    audienceSize: '影响2000-10000粉丝',
+    effectData: '掉粉率2-5%，评论区负面情绪增加',
+    source: '2024年社交媒体风险案例'
+  }
+];
