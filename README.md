@@ -1,6 +1,6 @@
 # 欢迎使用你的秒哒应用代码包
 秒哒应用链接
-    URL:[https://www.miaoda.cn/projects/app-8cdmk4dwu39d](https://app-8cr4d2k2ascg.appmiaoda.com)
+    URL:[[https://www.miaoda.cn/projects/app-8cdmk4dwu39d](https://app-8cr4d2k2ascg.appmiaoda.com)](https://app-8ctbg09h5bsw.appmiaoda.com)
 
 ## 介绍
 
