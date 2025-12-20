@@ -353,6 +353,11 @@ function RelativeValueDisplay({
   getDifficultyBadge: (difficulty: 'easy' | 'medium' | 'hard') => React.ReactElement;
   isRisk?: boolean;
 }) {
+  // 空值检查
+  if (!relativeValue) {
+    return null;
+  }
+
   return (
     <>
       {/* 历史分位数 */}
@@ -362,13 +367,13 @@ function RelativeValueDisplay({
             {isRisk ? '📉 相对风险等级' : '📈 相对价值等级'}
           </h4>
           <Badge variant="outline" className="text-base font-bold">
-            {relativeValue.rank}
+            {relativeValue.rank || '未评级'}
           </Badge>
         </div>
         <div className="mb-3 text-xs text-muted-foreground">
-          历史分位数：{relativeValue.percentile}%
+          历史分位数：{relativeValue.percentile || 0}%
         </div>
-        <p className="text-sm">{relativeValue.explanation}</p>
+        <p className="text-sm">{relativeValue.explanation || '暂无说明'}</p>
       </div>
 
       {/* 参考案例 */}
@@ -394,36 +399,40 @@ function RelativeValueDisplay({
       )}
 
       {/* 采纳成本 */}
-      <div className="rounded-lg border border-border bg-muted/50 p-4">
-        <h4 className="mb-3 text-sm font-semibold">⏱️ 采纳成本</h4>
-        <div className="space-y-2">
-          <div className="flex items-center justify-between text-sm">
-            <span className="flex items-center gap-2">
-              <Clock className="h-4 w-4" />
-              所需时间
-            </span>
-            <span className="font-medium">{relativeValue.adoptionCost.timeRequired}</span>
-          </div>
-          <div className="flex items-center justify-between text-sm">
-            <span className="flex items-center gap-2">
-              <Zap className="h-4 w-4" />
-              执行难度
-            </span>
-            {getDifficultyBadge(relativeValue.adoptionCost.difficulty)}
-          </div>
-          <div className="text-sm">
-            <span className="flex items-center gap-2">
-              <Target className="h-4 w-4" />
-              所需资源
-            </span>
-            <ul className="ml-6 mt-1 list-disc space-y-1">
-              {relativeValue.adoptionCost.resources.map((resource: string, idx: number) => (
+      {relativeValue.adoptionCost && (
+        <div className="rounded-lg border border-border bg-muted/50 p-4">
+          <h4 className="mb-3 text-sm font-semibold">⏱️ 采纳成本</h4>
+          <div className="space-y-2">
+            <div className="flex items-center justify-between text-sm">
+              <span className="flex items-center gap-2">
+                <Clock className="h-4 w-4" />
+                所需时间
+              </span>
+              <span className="font-medium">{relativeValue.adoptionCost.timeRequired || '未知'}</span>
+            </div>
+            <div className="flex items-center justify-between text-sm">
+              <span className="flex items-center gap-2">
+                <Zap className="h-4 w-4" />
+                执行难度
+              </span>
+              {relativeValue.adoptionCost.difficulty && getDifficultyBadge(relativeValue.adoptionCost.difficulty)}
+            </div>
+            {relativeValue.adoptionCost.resources && relativeValue.adoptionCost.resources.length > 0 && (
+              <div className="text-sm">
+                <span className="flex items-center gap-2">
+                  <Target className="h-4 w-4" />
+                  所需资源
+                </span>
+                <ul className="ml-6 mt-1 list-disc space-y-1">
+                  {relativeValue.adoptionCost.resources.map((resource: string, idx: number) => (
                 <li key={idx}>{resource}</li>
               ))}
             </ul>
           </div>
+            )}
+          </div>
         </div>
-      </div>
+      )}
     </>
   );
 }
