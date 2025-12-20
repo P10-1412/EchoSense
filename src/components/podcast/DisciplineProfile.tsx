@@ -121,7 +121,7 @@ export default function DisciplineProfile({ records, customDisciplines }: Discip
                             <div>
                               <h4 className="mb-1 text-sm font-semibold">客观观察：</h4>
                               <ul className="list-inside list-disc space-y-1 text-sm text-muted-foreground">
-                                {record.observations.map((obs, idx) => (
+                                {(record.observations || []).map((obs, idx) => (
                                   <li key={idx}>{obs}</li>
                                 ))}
                               </ul>
@@ -167,7 +167,7 @@ export default function DisciplineProfile({ records, customDisciplines }: Discip
                           <div>
                             <h4 className="mb-1 text-sm font-semibold">客观观察：</h4>
                             <ul className="list-inside list-disc space-y-1 text-sm text-muted-foreground">
-                              {record.observations.map((obs, idx) => (
+                              {(record.observations || []).map((obs, idx) => (
                                 <li key={idx}>{obs}</li>
                               ))}
                             </ul>

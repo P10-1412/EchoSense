@@ -237,8 +237,7 @@ ${podcastContent}
       "discipline": "law | psychology | business | health | communication",
       "date": "2025-12-19",
       "podcastTitle": "播客标题",
-      "findings": ["核心发现1", "核心发现2"],
-      "suggestions": ["建议1", "建议2"],
+      "observations": ["客观观察1", "客观观察2"],
       "severity": "low | medium | high"
     }
   ]
@@ -250,8 +249,14 @@ ${podcastContent}
 2. **相对价值**：必须从案例库匹配参考案例，不输出绝对金额，仅提供区间和可解释路径
 3. **采纳成本**：必须考虑用户的时间成本、执行难度、所需资源
 4. **用户画像**：评估时必须结合用户的账号风格、受众特征、风险承受能力
-5. **全科视角**：必须从五大学科角度记录发现，即使没有高价值建议，也要输出学科记录
-6. **案例库参考**：
+5. **全科视角**：必须从五大学科角度记录客观事实，画像中只记录observations（客观观察），不包含建议
+6. **画像记录要求**：
+   - 法律画像：记录法律风险、合规问题等客观事实
+   - 心理画像：记录播主心理状态、情绪模式、认知特征等客观观察
+   - 商业画像：记录商业认知水平、财务素养等客观事实
+   - 健康画像：记录生活方式、健康状态等客观观察
+   - 传播学画像：记录账号风格、受众特征、传播效果等客观数据
+7. **案例库参考**：
    - 商业化：${JSON.stringify(COMMERCIAL_CASE_LIBRARY.slice(0, 2))}
    - 传播：${JSON.stringify(VIRAL_CASE_LIBRARY.slice(0, 2))}
    - 风险：${JSON.stringify(RISK_CASE_LIBRARY.slice(0, 2))}
