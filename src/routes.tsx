@@ -10,7 +10,7 @@ interface RouteConfig {
 
 const routes: RouteConfig[] = [
   {
-    name: 'choSense 播客分析',
+    name: 'EchoSense 播客分析',
     path: '/',
     element: <PodcastAnalysis />
   }

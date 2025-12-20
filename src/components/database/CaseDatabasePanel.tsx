@@ -74,7 +74,7 @@ export default function CaseDatabasePanel({ cases, onCasesChange }: CaseDatabase
     const url = URL.createObjectURL(dataBlob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `chosense-cases-${Date.now()}.json`;
+    link.download = `echosense-cases-${Date.now()}.json`;
     link.click();
     URL.revokeObjectURL(url);
 

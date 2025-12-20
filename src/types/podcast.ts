@@ -244,6 +244,13 @@ export interface UserSettings {
     communication: boolean;
   };
   analysisDepth: 'basic' | 'standard' | 'detailed';
+  targetAudience: {
+    demographics: string; // 人口统计特征
+    interests: string; // 兴趣爱好
+    painPoints: string; // 痛点需求
+    consumptionHabits: string; // 消费习惯
+    mediaPreferences: string; // 媒体偏好
+  };
 }
 
 export const DEFAULT_SETTINGS: UserSettings = {
@@ -263,7 +270,14 @@ export const DEFAULT_SETTINGS: UserSettings = {
     health: true,
     communication: true
   },
-  analysisDepth: 'standard'
+  analysisDepth: 'standard',
+  targetAudience: {
+    demographics: '25-35岁职场人士，一二线城市，本科及以上学历',
+    interests: '职场发展、个人成长、知识学习',
+    painPoints: '职业瓶颈、时间管理、技能提升',
+    consumptionHabits: '愿意为优质内容付费，注重性价比',
+    mediaPreferences: '播客、视频号、公众号、小红书'
+  }
 };
 
 export const DEFAULT_USER_PROFILE: UserProfile = {

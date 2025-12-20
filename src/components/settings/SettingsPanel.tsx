@@ -4,6 +4,7 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Slider } from '@/components/ui/slider';
 import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
 import { 
   Select,
   SelectContent,
@@ -11,7 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Settings, Bell, Filter, BookOpen, Gauge } from 'lucide-react';
+import { Settings, Bell, Filter, BookOpen, Gauge, Users } from 'lucide-react';
 import { UserSettings, DEFAULT_SETTINGS } from '@/types/podcast';
 import { useToast } from '@/hooks/use-toast';
 
@@ -298,6 +299,100 @@ export default function SettingsPanel({ settings, onSettingsChange }: SettingsPa
             {localSettings.analysisDepth === 'standard' && '标准分析，提供全面的价值评估和建议'}
             {localSettings.analysisDepth === 'detailed' && '深度分析，包含详细的案例匹配和多维度评估'}
           </p>
+        </CardContent>
+      </Card>
+
+      {/* 目标群体画像 */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Users className="h-5 w-5 text-primary" />
+            目标群体画像
+          </CardTitle>
+          <CardDescription>
+            描述您的目标受众特征，AI将根据此画像进行更精准的分析
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="demographics">人口统计特征</Label>
+            <Textarea
+              id="demographics"
+              placeholder="例如：25-35岁职场人士，一二线城市，本科及以上学历"
+              value={localSettings.targetAudience.demographics}
+              onChange={(e) =>
+                setLocalSettings({
+                  ...localSettings,
+                  targetAudience: { ...localSettings.targetAudience, demographics: e.target.value }
+                })
+              }
+              className="min-h-20"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="interests">兴趣爱好</Label>
+            <Textarea
+              id="interests"
+              placeholder="例如：职场发展、个人成长、知识学习"
+              value={localSettings.targetAudience.interests}
+              onChange={(e) =>
+                setLocalSettings({
+                  ...localSettings,
+                  targetAudience: { ...localSettings.targetAudience, interests: e.target.value }
+                })
+              }
+              className="min-h-20"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="painPoints">痛点需求</Label>
+            <Textarea
+              id="painPoints"
+              placeholder="例如：职业瓶颈、时间管理、技能提升"
+              value={localSettings.targetAudience.painPoints}
+              onChange={(e) =>
+                setLocalSettings({
+                  ...localSettings,
+                  targetAudience: { ...localSettings.targetAudience, painPoints: e.target.value }
+                })
+              }
+              className="min-h-20"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="consumptionHabits">消费习惯</Label>
+            <Textarea
+              id="consumptionHabits"
+              placeholder="例如：愿意为优质内容付费，注重性价比"
+              value={localSettings.targetAudience.consumptionHabits}
+              onChange={(e) =>
+                setLocalSettings({
+                  ...localSettings,
+                  targetAudience: { ...localSettings.targetAudience, consumptionHabits: e.target.value }
+                })
+              }
+              className="min-h-20"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="mediaPreferences">媒体偏好</Label>
+            <Textarea
+              id="mediaPreferences"
+              placeholder="例如：播客、视频号、公众号、小红书"
+              value={localSettings.targetAudience.mediaPreferences}
+              onChange={(e) =>
+                setLocalSettings({
+                  ...localSettings,
+                  targetAudience: { ...localSettings.targetAudience, mediaPreferences: e.target.value }
+                })
+              }
+              className="min-h-20"
+            />
+          </div>
         </CardContent>
       </Card>
 

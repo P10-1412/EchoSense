@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Loader2, Radio, Link2, FileText, Sparkles, Eye, EyeOff, Settings, History, Database } from 'lucide-react';
+import { Loader2, Radio, Link2, FileText, Sparkles, Eye, EyeOff, Settings, History, Database, RotateCcw } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import api, { WENXIN_CHAT_ENDPOINT } from '@/services/api';
 import { sendChatStream } from '@/services/chatStream';
@@ -31,10 +31,10 @@ import {
 } from '@/types/podcast';
 
 const APP_ID = import.meta.env.VITE_APP_ID;
-const USER_PROFILE_KEY = 'chosense_user_profile';
-const SETTINGS_KEY = 'chosense_settings';
-const HISTORY_KEY = 'chosense_history';
-const CASES_KEY = 'chosense_cases';
+const USER_PROFILE_KEY = 'echosense_user_profile';
+const SETTINGS_KEY = 'echosense_settings';
+const HISTORY_KEY = 'echosense_history';
+const CASES_KEY = 'echosense_cases';
 
 export default function PodcastAnalysis() {
   const [inputMode, setInputMode] = useState<InputMode>(InputMode.URL);
@@ -69,6 +69,26 @@ export default function PodcastAnalysis() {
 
   // 加载所有数据
   useEffect(() => {
+    // 数据迁移：从旧的chosense_*迁移到新的echosense_*
+    const migrateOldData = () => {
+      const oldKeys = ['chosense_user_profile', 'chosense_settings', 'chosense_history', 'chosense_cases'];
+      const newKeys = [USER_PROFILE_KEY, SETTINGS_KEY, HISTORY_KEY, CASES_KEY];
+      
+      oldKeys.forEach((oldKey, index) => {
+        const oldData = localStorage.getItem(oldKey);
+        const newKey = newKeys[index];
+        const newData = localStorage.getItem(newKey);
+        
+        // 如果旧数据存在且新数据不存在，则迁移
+        if (oldData && !newData) {
+          localStorage.setItem(newKey, oldData);
+          localStorage.removeItem(oldKey);
+        }
+      });
+    };
+    
+    migrateOldData();
+    
     // 加载用户画像
     const storedProfile = localStorage.getItem(USER_PROFILE_KEY);
     if (storedProfile) {
@@ -83,7 +103,12 @@ export default function PodcastAnalysis() {
     const storedSettings = localStorage.getItem(SETTINGS_KEY);
     if (storedSettings) {
       try {
-        setSettings(JSON.parse(storedSettings));
+        const parsedSettings = JSON.parse(storedSettings);
+        // 确保新字段存在
+        if (!parsedSettings.targetAudience) {
+          parsedSettings.targetAudience = DEFAULT_SETTINGS.targetAudience;
+        }
+        setSettings(parsedSettings);
       } catch (error) {
         console.error('加载设置失败:', error);
       }
@@ -132,6 +157,32 @@ export default function PodcastAnalysis() {
   const saveCases = (newCases: CaseDatabase[]) => {
     localStorage.setItem(CASES_KEY, JSON.stringify(newCases));
     setCases(newCases);
+  };
+
+  // 一键重置所有数据
+  const handleResetAll = () => {
+    if (window.confirm('确定要重置所有数据吗？这将清除所有用户画像、设置、历史记录和案例数据库，此操作不可恢复！')) {
+      // 清除localStorage
+      localStorage.removeItem(USER_PROFILE_KEY);
+      localStorage.removeItem(SETTINGS_KEY);
+      localStorage.removeItem(HISTORY_KEY);
+      localStorage.removeItem(CASES_KEY);
+      
+      // 重置状态
+      setUserProfile(DEFAULT_USER_PROFILE);
+      setSettings(DEFAULT_SETTINGS);
+      setHistory([]);
+      setCases([]);
+      setHighValueSuggestions([]);
+      setDisciplineRecords([]);
+      setPodcastUrl('');
+      setTranscript('');
+      
+      toast({
+        title: '重置成功',
+        description: '所有数据已恢复为默认状态',
+      });
+    }
   };
 
   // 解析AI返回的JSON
@@ -185,7 +236,7 @@ export default function PodcastAnalysis() {
       if (inputMode === InputMode.URL) {
         toast({
           title: '正在提取播客内容...',
-          description: 'choSense 静默运行中，仅在检测到关键节点时出现',
+          description: 'EchoSense 静默运行中，仅在检测到关键节点时出现',
         });
 
         const summaryResponse: any = await api.webSummary(
@@ -212,7 +263,7 @@ export default function PodcastAnalysis() {
         description: '正在进行全科视角的价值评估与风险识别',
       });
 
-      const analysisPrompt = `你是choSense播客分析专家，专注于"静默运行、精准识别"的价值雷达系统。
+      const analysisPrompt = `你是EchoSense播客分析专家，专注于"静默运行、精准识别"的价值雷达系统。
 
 【核心理念】
 - 不替代创作、不打断表达
@@ -227,6 +278,13 @@ export default function PodcastAnalysis() {
 平均互动率：${userProfile.communication.avgEngagement}%
 风险承受能力：${userProfile.business.riskTolerance}
 投资贴现率：${userProfile.business.investmentDiscount}
+
+【目标群体画像】
+人口统计特征：${settings.targetAudience.demographics}
+兴趣爱好：${settings.targetAudience.interests}
+痛点需求：${settings.targetAudience.painPoints}
+消费习惯：${settings.targetAudience.consumptionHabits}
+媒体偏好：${settings.targetAudience.mediaPreferences}
 
 【播客内容】
 ${podcastContent}
@@ -371,7 +429,7 @@ ${podcastContent}
         messages: [
           {
             role: 'system',
-            content: 'you are choSense播客分析专家，专注于静默运行的价值雷达系统。你的输出必须是严格的JSON格式。'
+            content: 'you are EchoSense播客分析专家，专注于静默运行的价值雷达系统。你的输出必须是严格的JSON格式。'
           },
           {
             role: 'user',
@@ -477,7 +535,7 @@ ${podcastContent}
                   <Radio className="h-6 w-6 text-primary-foreground" />
                 </div>
                 <div>
-                  <h1 className="text-2xl font-bold text-foreground">choSense</h1>
+                  <h1 className="text-2xl font-bold text-foreground">EchoSense</h1>
                   <p className="text-sm text-muted-foreground">静默运行内容价值雷达 · 不替代创作，不打断表达</p>
                 </div>
               </div>
@@ -530,6 +588,15 @@ ${podcastContent}
                   </span>
                 )}
               </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleResetAll}
+                className="gap-2 text-destructive hover:text-destructive"
+              >
+                <RotateCcw className="h-4 w-4" />
+                一键重置
+              </Button>
             </div>
           </div>
         </div>
@@ -548,7 +615,7 @@ ${podcastContent}
                   播客内容分析
                 </CardTitle>
                 <CardDescription>
-                  choSense 默认静默运行，仅在检测到高价值或高风险节点时出现，不打扰你的创作节奏
+                  EchoSense 默认静默运行，仅在检测到高价值或高风险节点时出现，不打扰你的创作节奏
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -625,7 +692,7 @@ ${podcastContent}
                 <Alert className="mt-6">
                   <AlertDescription className="text-sm">
                     <strong>💡 静默运行模式：</strong>
-                    choSense 仅推送历史分位数前1%的极高价值内容和前10%的高价值内容，
+                    EchoSense 仅推送历史分位数前1%的极高价值内容和前10%的高价值内容，
                     确保每一条提示都值得您的关注。其余时间保持静默，让您专注创作。
                   </AlertDescription>
                 </Alert>
@@ -653,7 +720,7 @@ ${podcastContent}
                     开始分析您的播客内容
                   </h3>
                   <p className="max-w-md text-sm text-muted-foreground">
-                    输入播客URL或粘贴文字稿，choSense将以全科视角进行静默分析，
+                    输入播客URL或粘贴文字稿，EchoSense将以全科视角进行静默分析，
                     仅在检测到极高价值或高风险节点时主动提示
                   </p>
                 </CardContent>
@@ -745,7 +812,7 @@ ${podcastContent}
       {/* 页脚 */}
       <footer className="mt-16 border-t border-border bg-card py-8">
         <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
-          <p>© 2025 choSense · 静默运行内容价值雷达 · 让创作更纯粹、变现更高效、表达更安全</p>
+          <p>© 2025 EchoSense · 静默运行内容价值雷达 · 让创作更纯粹、变现更高效、表达更安全</p>
         </div>
       </footer>
     </div>
