@@ -8,6 +8,7 @@
   - [x] 其他学科画像：客观记录相关事实
   - [x] 修复重复显示bug（添加去重逻辑）
   - [x] 修复observations字段undefined错误
+  - [x] 强制AI生成observations（更新提示词）
 - [x] 步骤2: 历史记录系统
   - [x] 定义AnalysisHistory类型
   - [x] 创建HistoryPanel组件
@@ -26,20 +27,25 @@
   - [x] 实现数据导出功能
   - [x] AI辅助整合（UI已实现）
   - [x] 数据库查看和管理界面
-- [ ] 步骤5: 升级主页面
-  - [ ] 整合设置系统
-  - [ ] 整合历史记录
-  - [ ] 整合案例数据库
+- [x] 步骤5: 升级主页面
+  - [x] 整合设置系统（Dialog形式）
+  - [x] 整合历史记录（Dialog形式）
+  - [x] 整合案例数据库（Dialog形式）
+  - [x] 添加显眼的操作按钮（头部第二行）
   - [x] 更新AI提示词（使用observations字段）
+  - [x] 强制生成observations（提供具体示例）
 - [x] 步骤6: 验证和测试
   - [x] 运行lint检查（已通过）
   - [x] 修复运行时错误
 
 ## Notes
 - 画像系统：已改为仅记录客观事实，移除建议字段
-- 历史记录：HistoryPanel组件已完成
-- 设置系统：SettingsPanel组件已完成，支持全面自定义
-- 案例数据库：CaseDatabasePanel组件已完成，支持导入导出
+- 历史记录：HistoryPanel组件已完成并集成
+- 设置系统：SettingsPanel组件已完成并集成
+- 案例数据库：CaseDatabasePanel组件已完成并集成
 - 重复bug：已在DisciplineProfile中添加去重逻辑
 - observations错误：已添加空值保护和AI提示词更新
+- 强制生成observations：AI提示词中添加了具体示例和强制要求
+- 操作入口：在头部添加了显眼的设置、历史记录、案例数据库按钮
 - 所有新组件已通过lint检查并修复运行时错误
+- 所有功能已完整集成到主页面

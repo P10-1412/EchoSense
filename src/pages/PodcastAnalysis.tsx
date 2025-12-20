@@ -6,12 +6,15 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Loader2, Radio, Link2, FileText, Sparkles, Eye, EyeOff } from 'lucide-react';
+import { Loader2, Radio, Link2, FileText, Sparkles, Eye, EyeOff, Settings, History, Database } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import api, { WENXIN_CHAT_ENDPOINT } from '@/services/api';
 import { sendChatStream } from '@/services/chatStream';
 import SuggestionCard from '@/components/podcast/SuggestionCard';
 import DisciplineProfile from '@/components/podcast/DisciplineProfile';
+import SettingsPanel from '@/components/settings/SettingsPanel';
+import HistoryPanel from '@/components/history/HistoryPanel';
+import CaseDatabasePanel from '@/components/database/CaseDatabasePanel';
 import { 
   InputMode, 
   Suggestion, 
@@ -20,11 +23,18 @@ import {
   DEFAULT_USER_PROFILE,
   COMMERCIAL_CASE_LIBRARY,
   VIRAL_CASE_LIBRARY,
-  RISK_CASE_LIBRARY
+  RISK_CASE_LIBRARY,
+  UserSettings,
+  DEFAULT_SETTINGS,
+  AnalysisHistory,
+  CaseDatabase
 } from '@/types/podcast';
 
 const APP_ID = import.meta.env.VITE_APP_ID;
 const USER_PROFILE_KEY = 'chosense_user_profile';
+const SETTINGS_KEY = 'chosense_settings';
+const HISTORY_KEY = 'chosense_history';
+const CASES_KEY = 'chosense_cases';
 
 export default function PodcastAnalysis() {
   const [inputMode, setInputMode] = useState<InputMode>(InputMode.URL);
@@ -40,19 +50,62 @@ export default function PodcastAnalysis() {
   // 用户画像
   const [userProfile, setUserProfile] = useState<UserProfile>(DEFAULT_USER_PROFILE);
   
+  // 用户设置
+  const [settings, setSettings] = useState<UserSettings>(DEFAULT_SETTINGS);
+  
+  // 历史记录
+  const [history, setHistory] = useState<AnalysisHistory[]>([]);
+  
+  // 案例数据库
+  const [cases, setCases] = useState<CaseDatabase[]>([]);
+  
   // UI状态
   const [showDisciplineProfile, setShowDisciplineProfile] = useState(false);
+  const [showSettingsDialog, setShowSettingsDialog] = useState(false);
+  const [showHistoryDialog, setShowHistoryDialog] = useState(false);
+  const [showCasesDialog, setShowCasesDialog] = useState(false);
   
   const { toast } = useToast();
 
-  // 加载用户画像
+  // 加载所有数据
   useEffect(() => {
-    const stored = localStorage.getItem(USER_PROFILE_KEY);
-    if (stored) {
+    // 加载用户画像
+    const storedProfile = localStorage.getItem(USER_PROFILE_KEY);
+    if (storedProfile) {
       try {
-        setUserProfile(JSON.parse(stored));
+        setUserProfile(JSON.parse(storedProfile));
       } catch (error) {
         console.error('加载用户画像失败:', error);
+      }
+    }
+    
+    // 加载设置
+    const storedSettings = localStorage.getItem(SETTINGS_KEY);
+    if (storedSettings) {
+      try {
+        setSettings(JSON.parse(storedSettings));
+      } catch (error) {
+        console.error('加载设置失败:', error);
+      }
+    }
+    
+    // 加载历史记录
+    const storedHistory = localStorage.getItem(HISTORY_KEY);
+    if (storedHistory) {
+      try {
+        setHistory(JSON.parse(storedHistory));
+      } catch (error) {
+        console.error('加载历史记录失败:', error);
+      }
+    }
+    
+    // 加载案例数据库
+    const storedCases = localStorage.getItem(CASES_KEY);
+    if (storedCases) {
+      try {
+        setCases(JSON.parse(storedCases));
+      } catch (error) {
+        console.error('加载案例数据库失败:', error);
       }
     }
   }, []);
@@ -61,6 +114,24 @@ export default function PodcastAnalysis() {
   const saveUserProfile = (profile: UserProfile) => {
     localStorage.setItem(USER_PROFILE_KEY, JSON.stringify(profile));
     setUserProfile(profile);
+  };
+  
+  // 保存设置
+  const saveSettings = (newSettings: UserSettings) => {
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify(newSettings));
+    setSettings(newSettings);
+  };
+  
+  // 保存历史记录
+  const saveHistory = (newHistory: AnalysisHistory[]) => {
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(newHistory));
+    setHistory(newHistory);
+  };
+  
+  // 保存案例数据库
+  const saveCases = (newCases: CaseDatabase[]) => {
+    localStorage.setItem(CASES_KEY, JSON.stringify(newCases));
+    setCases(newCases);
   };
 
   // 解析AI返回的JSON
@@ -233,12 +304,40 @@ ${podcastContent}
   ],
   "disciplines": [
     {
-      "id": "唯一标识",
-      "discipline": "law | psychology | business | health | communication",
+      "id": "discipline_law_001",
+      "discipline": "law",
       "date": "2025-12-19",
       "podcastTitle": "播客标题",
-      "observations": ["客观观察1", "客观观察2"],
-      "severity": "low | medium | high"
+      "observations": [
+        "在推荐产品时未使用免责声明",
+        "对某行业做出绝对化评价，可能涉及商业诋毁风险",
+        "引用数据时未注明来源"
+      ],
+      "severity": "medium"
+    },
+    {
+      "id": "discipline_psychology_001",
+      "discipline": "psychology",
+      "date": "2025-12-19",
+      "podcastTitle": "播客标题",
+      "observations": [
+        "在讨论工作话题时，多次使用'必须'、'一定要'等绝对化表述",
+        "对失败的容忍度较低，表现出明显的完美主义倾向",
+        "情绪波动较大，从兴奋到沮丧转换迅速"
+      ],
+      "severity": "low"
+    },
+    {
+      "id": "discipline_communication_001",
+      "discipline": "communication",
+      "date": "2025-12-19",
+      "podcastTitle": "播客标题",
+      "observations": [
+        "受众主要为25-35岁职场人士",
+        "内容风格偏向深度分析，单期时长30-45分钟",
+        "平均互动率3.5%，高于行业平均水平",
+        "受众更喜欢实用技巧类内容，理论讨论互动较低"
+      ]
     }
   ]
 }
@@ -249,14 +348,15 @@ ${podcastContent}
 2. **相对价值**：必须从案例库匹配参考案例，不输出绝对金额，仅提供区间和可解释路径
 3. **采纳成本**：必须考虑用户的时间成本、执行难度、所需资源
 4. **用户画像**：评估时必须结合用户的账号风格、受众特征、风险承受能力
-5. **全科视角**：必须从五大学科角度记录客观事实，画像中只记录observations（客观观察），不包含建议
-6. **画像记录要求**：
-   - 法律画像：记录法律风险、合规问题等客观事实
-   - 心理画像：记录播主心理状态、情绪模式、认知特征等客观观察
-   - 商业画像：记录商业认知水平、财务素养等客观事实
-   - 健康画像：记录生活方式、健康状态等客观观察
-   - 传播学画像：记录账号风格、受众特征、传播效果等客观数据
-7. **案例库参考**：
+5. **全科视角（必须）**：必须从五大学科角度记录客观事实，每个学科至少2-3条observations
+6. **画像记录要求（强制）**：
+   - 法律画像：记录法律风险、合规问题、免责声明使用情况等客观事实
+   - 心理画像：记录播主心理状态、情绪模式、认知特征、压力反应等客观观察
+   - 商业画像：记录商业认知水平、财务素养、变现历史等客观事实
+   - 健康画像：记录生活方式、压力指标、健康意识等客观观察
+   - 传播学画像：记录账号风格、受众特征、内容风格、传播效果等客观数据
+7. **observations字段（必填）**：每个discipline记录必须包含observations数组，至少2-3条具体观察
+8. **案例库参考**：
    - 商业化：${JSON.stringify(COMMERCIAL_CASE_LIBRARY.slice(0, 2))}
    - 传播：${JSON.stringify(VIRAL_CASE_LIBRARY.slice(0, 2))}
    - 风险：${JSON.stringify(RISK_CASE_LIBRARY.slice(0, 2))}
@@ -369,24 +469,68 @@ ${podcastContent}
       {/* 头部 */}
       <header className="border-b border-border bg-card">
         <div className="container mx-auto px-4 py-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary">
-                <Radio className="h-6 w-6 text-primary-foreground" />
+          <div className="flex flex-col gap-4">
+            {/* 第一行：Logo和标题 */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary">
+                  <Radio className="h-6 w-6 text-primary-foreground" />
+                </div>
+                <div>
+                  <h1 className="text-2xl font-bold text-foreground">choSense</h1>
+                  <p className="text-sm text-muted-foreground">静默运行内容价值雷达 · 不替代创作，不打断表达</p>
+                </div>
               </div>
-              <div>
-                <h1 className="text-2xl font-bold text-foreground">choSense</h1>
-                <p className="text-sm text-muted-foreground">静默运行内容价值雷达 · 不替代创作，不打断表达</p>
-              </div>
+              <Button
+                variant={showDisciplineProfile ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setShowDisciplineProfile(!showDisciplineProfile)}
+              >
+                {showDisciplineProfile ? <EyeOff className="mr-2 h-4 w-4" /> : <Eye className="mr-2 h-4 w-4" />}
+                {showDisciplineProfile ? '隐藏' : '查看'}全科画像
+              </Button>
             </div>
-            <Button
-              variant={showDisciplineProfile ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setShowDisciplineProfile(!showDisciplineProfile)}
-            >
-              {showDisciplineProfile ? <EyeOff className="mr-2 h-4 w-4" /> : <Eye className="mr-2 h-4 w-4" />}
-              {showDisciplineProfile ? '隐藏' : '查看'}全科画像
-            </Button>
+            
+            {/* 第二行：操作按钮 */}
+            <div className="flex flex-wrap gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowSettingsDialog(true)}
+                className="gap-2"
+              >
+                <Settings className="h-4 w-4" />
+                设置
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowHistoryDialog(true)}
+                className="gap-2"
+              >
+                <History className="h-4 w-4" />
+                历史记录
+                {history.length > 0 && (
+                  <span className="ml-1 rounded-full bg-primary px-2 py-0.5 text-xs text-primary-foreground">
+                    {history.length}
+                  </span>
+                )}
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowCasesDialog(true)}
+                className="gap-2"
+              >
+                <Database className="h-4 w-4" />
+                案例数据库
+                {cases.length > 0 && (
+                  <span className="ml-1 rounded-full bg-primary px-2 py-0.5 text-xs text-primary-foreground">
+                    {cases.length}
+                  </span>
+                )}
+              </Button>
+            </div>
           </div>
         </div>
       </header>
@@ -548,6 +692,53 @@ ${podcastContent}
                 <SuggestionCard key={suggestion.id} suggestion={suggestion} />
               ))}
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* 设置对话框 */}
+      <Dialog open={showSettingsDialog} onOpenChange={setShowSettingsDialog}>
+        <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>系统设置</DialogTitle>
+            <DialogDescription>
+              自定义分析行为和显示偏好
+            </DialogDescription>
+          </DialogHeader>
+          <SettingsPanel settings={settings} onSettingsChange={saveSettings} />
+        </DialogContent>
+      </Dialog>
+
+      {/* 历史记录对话框 */}
+      <Dialog open={showHistoryDialog} onOpenChange={setShowHistoryDialog}>
+        <DialogContent className="max-h-[90vh] max-w-4xl overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>分析历史记录</DialogTitle>
+            <DialogDescription>
+              查看所有历史分析记录和建议
+            </DialogDescription>
+          </DialogHeader>
+          <HistoryPanel 
+            history={history} 
+            onViewDetail={(item) => {
+              toast({
+                title: '查看详情',
+                description: `播客：${item.podcastTitle}`,
+              });
+            }} 
+          />
+        </DialogContent>
+      </Dialog>
+
+      {/* 案例数据库对话框 */}
+      <Dialog open={showCasesDialog} onOpenChange={setShowCasesDialog}>
+        <DialogContent className="max-h-[90vh] max-w-5xl overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>案例数据库</DialogTitle>
+            <DialogDescription>
+              导入和管理历史案例数据，用于更精准的价值评估
+            </DialogDescription>
+          </DialogHeader>
+          <CaseDatabasePanel cases={cases} onCasesChange={saveCases} />
         </DialogContent>
       </Dialog>
 
