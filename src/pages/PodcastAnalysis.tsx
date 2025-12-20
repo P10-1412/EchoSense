@@ -472,14 +472,6 @@ ${podcastContent}
           
           const { suggestions, disciplines } = parseAIResponse(fullResponse);
           
-          if (suggestions.length === 0 && disciplines.length === 0) {
-            toast({
-              title: '分析完成',
-              description: '未检测到需要重点关注的内容，您的播客整体表现良好',
-            });
-            return;
-          }
-
           // 更新建议
           setHighValueSuggestions(suggestions);
           setDisciplineRecords(disciplines);
@@ -495,7 +487,7 @@ ${podcastContent}
             saveUserProfile(updatedProfile);
           }
 
-          // 保存历史记录
+          // 保存历史记录（无论是否有建议都保存）
           const newHistoryItem: AnalysisHistory = {
             id: `history_${Date.now()}`,
             date: new Date().toISOString(),
@@ -509,6 +501,15 @@ ${podcastContent}
           
           const updatedHistory = [newHistoryItem, ...history];
           saveHistory(updatedHistory);
+
+          // 显示结果提示
+          if (suggestions.length === 0 && disciplines.length === 0) {
+            toast({
+              title: '分析完成',
+              description: '未检测到需要重点关注的内容，您的播客整体表现良好',
+            });
+            return;
+          }
 
           // 检查是否有极高价值内容（前1%）
           const criticalSuggestions = suggestions.filter(s => s.priority === 'critical');
@@ -555,13 +556,13 @@ ${podcastContent}
     }
   };
 
-  // 获取所有学科记录
+  // 获取所有学科记录（仅从历史中获取，避免重复）
   const getAllDisciplineRecords = (): DisciplineRecord[] => {
     const allRecords: DisciplineRecord[] = [];
     Object.values(userProfile.disciplineHistory).forEach(records => {
       allRecords.push(...records);
     });
-    allRecords.push(...disciplineRecords);
+    // 不再添加当前的disciplineRecords，因为它们已经被保存到历史中了
     return allRecords.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   };
 
